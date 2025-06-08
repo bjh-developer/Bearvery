@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { supabase } from './lib/supabase';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -47,6 +48,7 @@ function App() {
           />
         </Routes>
       </BackgroundProvider>
+      <SpeedInsights />
     </Router>
   );
 }
