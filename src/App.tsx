@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from './stores/authStore';
 import { supabase } from './lib/supabase';
 
+// Analytics
+import { inject } from '@vercel/analytics';
+inject();
+
 // Pages
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
