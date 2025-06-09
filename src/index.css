@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Add this to ensure full height and no scrolling */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
