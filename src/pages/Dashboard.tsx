@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
+import { useGamificationStore } from '../stores/gamificationStore';
 import { useBackground } from '../components/BackgroundProvider';
 import Clock from '../components/Clock';
 import TodoList from '../components/TodoList';
@@ -7,12 +8,19 @@ import ComPAWnion from '../components/ComPAWnion';
 import JournalChat from '../components/JournalChat';
 import MoodTracker from '../components/MoodTracker';
 import BreakTimer from '../components/BreakTimer';
+import GamificationPanel from '../components/GamificationPanel';
 import { RefreshCw, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
   const { signOut } = useAuthStore();
+  const { fetchUserProgress } = useGamificationStore();
   const { nextBackground } = useBackground();
   const [activePanel, setActivePanel] = useState<string | null>(null);
+
+  // Initialize gamification data
+  useEffect(() => {
+    fetchUserProgress();
+  }, [fetchUserProgress]);
 
   // Toggle panel visibility
   const togglePanel = (panel: string) => {
@@ -55,7 +63,10 @@ const Dashboard = () => {
       </div>
 
       {/* Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        {/* Gamification Panel */}
+        <GamificationPanel />
+        
         {/* ComPAWnion */}
         <ComPAWnion />
         

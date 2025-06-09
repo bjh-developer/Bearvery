@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
-import { PlusCircle, CheckCircle, Circle, Trash2 } from 'lucide-react';
+import { useGamificationStore } from '../stores/gamificationStore';
+import { PlusCircle, CheckCircle, Circle, Trash2, Star } from 'lucide-react';
+import TaskCompletionAnimation from './TaskCompletionAnimation';
 
 interface Todo {
   id: string;
@@ -22,12 +24,14 @@ const categories = [
 
 const TodoList = () => {
   const { user } = useAuthStore();
+  const { completeTask } = useGamificationStore();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('work');
   const [dueDate, setDueDate] = useState('');
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
 
   // Fetch todos on component mount
   useEffect(() => {
@@ -104,6 +108,12 @@ const TodoList = () => {
       
       // Update local state
       setTodos(todos.map(todo => (todo.id === id ? updatedTodo : todo)));
+      
+      // If task was completed, trigger gamification
+      if (updatedTodo.completed) {
+        setShowCompletionAnimation(true);
+        await completeTask();
+      }
     } catch (error) {
       console.error('Error updating todo:', error);
     }
@@ -131,8 +141,23 @@ const TodoList = () => {
       ? todos.filter(todo => todo.completed) 
       : todos.filter(todo => !todo.completed);
 
+  const completedToday = todos.filter(todo => 
+    todo.completed && 
+    new Date(todo.created_at || '').toDateString() === new Date().toDateString()
+  ).length;
+
   return (
     <div className="h-full flex flex-col">
+      {/* Daily Progress */}
+      {completedToday > 0 && (
+        <div className="mb-4 bg-green-500/20 border border-green-500/50 rounded-lg p-3 flex items-center">
+          <Star className="text-yellow-400 mr-2\" size={16} />
+          <span className="text-sm">
+            Great job! You've completed {completedToday} task{completedToday > 1 ? 's' : ''} today!
+          </span>
+        </div>
+      )}
+
       <form onSubmit={addTodo} className="mb-4">
         <div className="flex mb-2">
           <input
@@ -257,6 +282,12 @@ const TodoList = () => {
           </ul>
         )}
       </div>
+
+      {/* Task Completion Animation */}
+      <TaskCompletionAnimation
+        show={showCompletionAnimation}
+        onComplete={() => setShowCompletionAnimation(false)}
+      />
     </div>
   );
 };

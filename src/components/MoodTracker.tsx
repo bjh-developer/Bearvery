@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
+import { useGamificationStore } from '../stores/gamificationStore';
 import { format } from 'date-fns';
 
 interface MoodEntry {
@@ -32,11 +33,13 @@ const moodOptions: MoodOption[] = [
 
 const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
   const { user } = useAuthStore();
+  const { trackMood } = useGamificationStore();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [recentMoods, setRecentMoods] = useState<MoodEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   
   // Fetch recent moods
   useEffect(() => {
@@ -82,8 +85,14 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
       
       if (error) throw error;
       
+      // Trigger gamification
+      await trackMood();
+      
       // Refetch to update history
       await fetchRecentMoods();
+      
+      // Show success animation
+      setShowSuccess(true);
       
       // Reset form
       setSelectedMood(null);
@@ -92,7 +101,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
       // Close the modal after a brief delay
       setTimeout(() => {
         onClose();
-      }, 1500);
+      }, 2000);
       
     } catch (error) {
       console.error('Error submitting mood:', error);
@@ -100,6 +109,16 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
       setIsSubmitting(false);
     }
   };
+
+  if (showSuccess) {
+    return (
+      <div className="text-white text-center py-8">
+        <div className="text-6xl mb-4">🎉</div>
+        <h3 className="text-xl font-bold mb-2">Mood Tracked!</h3>
+        <p className="text-white/70">+5 XP earned for tracking your mood</p>
+      </div>
+    );
+  }
   
   return (
     <div className="text-white">
@@ -149,6 +168,10 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
         </>
       ) : (
         <>
+          <div className="mb-4 text-center">
+            <p className="text-sm text-white/70">Track your mood to earn XP and maintain your wellness streak!</p>
+          </div>
+
           <div className="flex justify-between gap-2 mb-6">
             {moodOptions.map((mood) => (
               <button
@@ -156,7 +179,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
                 onClick={() => setSelectedMood(mood.value)}
                 className={`flex-1 flex flex-col items-center p-3 rounded-lg transition-transform ${
                   selectedMood === mood.value
-                    ? `${mood.color} transform scale-110`
+                    ? `${mood.color} transform scale-110 shadow-lg`
                     : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
@@ -185,7 +208,7 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ onClose }) => {
               disabled={!selectedMood || isSubmitting}
               className="flex-1 bg-white/20 hover:bg-white/30 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Saving...' : 'Save Mood'}
+              {isSubmitting ? 'Saving...' : 'Save Mood (+5 XP)'}
             </button>
             
             <button
