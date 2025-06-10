@@ -17,6 +17,12 @@ const Dashboard = () => {
   const { nextBackground } = useBackground();
   const [activePanel, setActivePanel] = useState<string | null>(null);
 
+  // Initialise bearapy AI call
+  const [isOpen, setIsOpen] = useState(false);
+  const handleCallBearapy = () => {
+    setIsOpen(true);
+  };
+
   // Initialize gamification data
   useEffect(() => {
     fetchUserProgress();
@@ -90,7 +96,7 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Journal Chat */}
+        {/* Journal Chat panel */}
         <div className={`
           bg-white/10 backdrop-blur-md rounded-xl p-4 overflow-hidden transition-all duration-300 ease-in-out
           ${activePanel === 'journal' ? 'h-96' : 'h-12'}
@@ -104,11 +110,48 @@ const Dashboard = () => {
               {activePanel === 'journal' ? '−' : '+'}
             </button>
           </div>
+
+          <div>
+            <div 
+              className="flex items-center justify-between cursor-pointer"
+              onClick={handleCallBearapy}
+            >
+              <button className="p-1 bg-white/10 rounded-full">
+                Call Bearapy
+              </button>
+            </div>
+          </div>
           
           <div className={`mt-2 ${activePanel === 'journal' ? 'block' : 'hidden'}`}>
             <JournalChat />
           </div>
         </div>
+
+        {/* Bearapy AI Pop-Up - moved outside journal panel */}
+        {isOpen && (
+          <div 
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
+          >
+            <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
+              {/* Close Button */}
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
+              >
+                ✕
+              </button>
+
+              {/* Tavus iframe */}
+              <iframe
+                src=""  // Replace with your real conversation URL
+                allow="camera; microphone; fullscreen; display-capture"
+                className="w-full h-full rounded-xl border-none"
+                title="Bearapy AI"
+              />
+            </div>
+          </div>
+        )}
+
         
         {/* Break Timer */}
         <div className={`
