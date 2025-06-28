@@ -13,6 +13,7 @@ interface Todo {
   category: string;
   due_date: string | null;
   user_id: string;
+  created_at: string; // Added created_at field
 }
 
 const categories = [
@@ -74,6 +75,7 @@ const TodoList = () => {
       category: selectedCategory,
       due_date: dueDate || null,
       user_id: user.id,
+      created_at: new Date().toISOString(), // Add created_at field here
     };
     
     try {
@@ -141,17 +143,17 @@ const TodoList = () => {
       ? todos.filter(todo => todo.completed) 
       : todos.filter(todo => !todo.completed);
 
-  const completedToday = todos.filter(todo => 
-    todo.completed && 
-    new Date(todo.created_at || '').toDateString() === new Date().toDateString()
-  ).length;
+  const completedToday = todos.filter(todo => {
+    const createdAtDate = new Date(todo.created_at || ''); // Ensure valid date
+    return todo.completed && createdAtDate.toDateString() === new Date().toDateString();
+  }).length;
 
   return (
     <div className="h-full flex flex-col">
       {/* Daily Progress */}
       {completedToday > 0 && (
         <div className="mb-4 bg-green-500/20 border border-green-500/50 rounded-lg p-3 flex items-center">
-          <Star className="text-yellow-400 mr-2\" size={16} />
+          <Star className="text-yellow-400 mr-2" size={16} />
           <span className="text-sm">
             Great job! You've completed {completedToday} task{completedToday > 1 ? 's' : ''} today!
           </span>
