@@ -151,51 +151,52 @@ const Dashboard = () => {
               </button>
           </div>
           <WordleGame />
+        </div>
+      </div>
+      )}
+
+      {/* Bearapy AI Pop-Up - moved outside journal panel */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
+        >
+          <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsOpen(false)}
+              className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
+            >
+              ✕
+            </button>
             
-        {/* Bearapy AI Pop-Up - moved outside journal panel */}
-        {isOpen && (
-          <div 
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
-          >
-            <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
-              {/* Close Button */}
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
-              >
-                ✕
-              </button>
-              
-              {/* Tavus iframe */}
-              <iframe
-                src={tavusURL}
-                allow="camera; microphone; fullscreen; display-capture"
-                className="w-full h-full rounded-xl border-none"
-                title="Bearapy AI"
-              />
+            {/* Tavus iframe */}
+            <iframe
+              src={tavusURL}
+              allow="camera; microphone; fullscreen; display-capture"
+              className="w-full h-full rounded-xl border-none"
+              title="Bearapy AI"
+            />
           </div>
         </div>
       )}
 
-        
-        {/* Mood Tracker Panel (conditionally rendered) */}
-        {activePanel === 'mood' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">How are you feeling today?</h2>
-                <button 
-                  onClick={() => setActivePanel(null)}
-                  className="p-2 hover:bg-white/10 rounded-full"
-                >
-                  ✕
-                </button>
-              </div>
-              <MoodTracker onClose={() => setActivePanel(null)} />
+      {/* Mood Tracker Panel (conditionally rendered) */}
+      {activePanel === 'mood' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">How are you feeling today?</h2>
+              <button 
+                onClick={() => setActivePanel(null)}
+                className="p-2 hover:bg-white/10 rounded-full"
+              >
+                ✕
+              </button>
             </div>
+            <MoodTracker onClose={() => setActivePanel(null)} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
