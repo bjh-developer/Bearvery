@@ -10,6 +10,21 @@ const quotes = [
   { text: "Be present in all things and thankful for all things.", author: "Maya Angelou" },
   { text: "Nothing is worth more than this day.", author: "Johann Wolfgang von Goethe" },
   { text: "Take a deep breath. It's just a bad day, not a bad life.", author: "Unknown" },
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { text: "You are stronger than you think.", author: "Unknown" },
+  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+  { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },
+  { text: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
+  { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+  { text: "You don’t have to be perfect to start. You just have to start.", author: "Unknown" },
+  { text: "Shoot for the moon. Even if you miss, you'll land among the stars.", author: "Norman Vincent Peale"},
+  { text: "One step at a time is still progress.", author: "Unknown" },
+  { text: "Be kind to yourself. You’re doing the best you can.", author: "Unknown" },
+  { text: "Rest is productive too.", author: "Unknown" },
+  { text: "Progress, not perfection.", author: "Unknown" },
+  { text: "Even on your worst day, you’re still growing.", author: "Unknown" },
+  { text: "Dream big. Start small. Act now.", author: "Robin Sharma" },
 ];
 
 const Clock = () => {
