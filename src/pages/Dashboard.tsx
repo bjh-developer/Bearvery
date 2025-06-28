@@ -16,12 +16,10 @@ const Dashboard = () => {
   const { fetchUserProgress } = useGamificationStore();
   const { nextBackground } = useBackground();
   const [activePanel, setActivePanel] = useState<string | null>(null);
-
-  // Initialise bearapy AI call
   const [isOpen, setIsOpen] = useState(false);
-  const handleCallBearapy = () => {
-    setIsOpen(true);
-  };
+  const [tavusUrl, setTavusUrl] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);  // loading indicator
+
 
   useEffect(() => {
     fetchUserProgress();
@@ -31,7 +29,40 @@ const Dashboard = () => {
     setActivePanel(activePanel === panel ? null : panel);
   };
 
-  const tavusURL = import.meta.env.VITE_TAVUS_URL;
+  const handleCallBearapy = async () => {
+    setIsStarting(true);
+    try {
+      // build payload (adjust replica/persona IDs to match your Tavus dashboard)
+      const payload = {
+        replica_id: import.meta.env.VITE_TAVUS_REPLICA_ID,
+        persona_id: import.meta.env.VITE_TAVUS_PERSONA_ID,
+        conversation_name: `Bearapy session ${Date.now()}`,
+        conversational_context:
+          'Anna is your warm, supportive Bearapy wellness coach—part trusted older sister, part friendly mentor—who greets you with playful, encouraging energy and knows when to be gentle and when to cheer you on. 🧾 “Hi, I’m Anna, your Bearapy wellness coach! Think of me as your personal cheerleader, check‑in buddy, and growth guide. I’m here to help you reflect, recharge, and move forward—one small paw‑step at a time. 🐾” 💬 Anna’s tone is warm and validating (never robotic or preachy), lightly playful but never dismissive, always offering empathy, small actionable suggestions, and genuine celebration of your wins. 🎯 In each conversation she: welcomes new users and explains Bearapy, provides daily mood check‑ins, celebrates consistency, guides self‑reflection through prompts, nudges breaks or calming actions, and offers gentle reminders when you miss log‑ins. 🧩 Example lines she might say: “Hey there! I’m Anna—so glad you’ve joined Bearapy. This is your space to breathe, reflect, and grow. Let me show you around!” … “Hi [Name], how are you feeling today? Whether it’s a high‑five day or a hide‑under‑the‑covers one, I’ve got you.” … “Looks like your mood has been a bit low this week—want to talk or journal about it?” … “3‑day journal streak?! That’s what I’m talking about—keep going, you’ve got this! 🐻✨” If the camera shows signs of distress, Anna gently validates and offers help or grounding exercises.',
+      };
+
+      const res = await fetch('https://tavusapi.com/v2/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_TAVUS_API_KEY, // <- stored in .env.local
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Tavus error ${res.status}`);
+      const data = await res.json();
+
+      setTavusUrl(data.conversation_url);
+      setIsOpen(true);
+    } catch (err) {
+      console.error(err);
+      alert('Could not start Bearapy call');
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen text-white flex flex-col overflow-hidden">
@@ -124,9 +155,10 @@ const Dashboard = () => {
               <div className="mt-2">
                 <button
                   onClick={handleCallBearapy}
-                  className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm"
+                  className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm disabled:opacity-50"
+                  disabled={isStarting}
                 >
-                  Call Bearapy
+                  {isStarting ? 'Starting…' : 'Call Bearapy'}
                 </button>
               </div>
 
@@ -161,25 +193,21 @@ const Dashboard = () => {
       )}
 
       {/* Bearapy AI Pop-Up - moved outside journal panel */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
-        >
-          <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
-            {/* Close Button */}
-            <button 
+      {isOpen && tavusUrl && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+          <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl overflow-hidden">
+            <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
+              className="absolute top-3 right-4 bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
             >
               ✕
             </button>
-            
-            {/* Tavus iframe */}
+
             <iframe
-              src={tavusURL}
+              src={tavusUrl}
               allow="camera; microphone; fullscreen; display-capture"
               className="w-full h-full rounded-xl border-none"
-              title="Bearapy AI"
+              title="Bearapy AI"
             />
           </div>
         </div>
