@@ -16,7 +16,6 @@ const Dashboard = () => {
   const { fetchUserProgress } = useGamificationStore();
   const { nextBackground } = useBackground();
   const [activePanel, setActivePanel] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
 
   // Initialise bearapy AI call
   const [isOpen, setIsOpen] = useState(false);
