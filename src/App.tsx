@@ -8,6 +8,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import WordlePage from './pages/Wordle'; // 👈 Import the new Wordle page
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -47,6 +48,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wordle"
+            element={
+              <ProtectedRoute>
+                <WordlePage /> {/* 👈 Add Wordle game route */}
               </ProtectedRoute>
             }
           />

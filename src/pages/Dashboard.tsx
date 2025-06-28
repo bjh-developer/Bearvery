@@ -8,6 +8,7 @@ import ComPAWnion from '../components/ComPAWnion';
 import JournalChat from '../components/JournalChat';
 import MoodTracker from '../components/MoodTracker';
 import GamificationPanel from '../components/GamificationPanel';
+import WordleGame from '../components/WordleGame'; // ✅ Import Wordle
 import { RefreshCw, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
@@ -31,12 +32,20 @@ const Dashboard = () => {
     <div className="min-h-screen text-white flex flex-col overflow-hidden">
       {/* Top Bar */}
       <div className="flex justify-between items-center p-4">
-        <button
-          onClick={() => togglePanel('mood')}
-          className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
-        >
-          Mood Tracker
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => togglePanel('mood')}
+            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
+          >
+            Mood Tracker
+          </button>
+          <button
+            onClick={() => togglePanel('wordle')}
+            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
+          >
+            Wordle Game
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={nextBackground}
@@ -101,45 +110,63 @@ const Dashboard = () => {
             <JournalChat />
           </div>
         </div>
+      </div>
 
-        {/* Mood Tracker Modal */}
-        {activePanel === 'mood' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">How are you feeling today?</h2>
-                <button
-                  onClick={() => setActivePanel(null)}
-                  className="p-2 hover:bg-white/10 rounded-full"
-                >
-                  ✕
-                </button>
-              </div>
-              <MoodTracker onClose={() => setActivePanel(null)} />
-            </div>
-          </div>
-        )}
-
-        {/* Bearapy AI Pop-Up */}
-        {isOpen && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
-            <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
+      {/* Mood Tracker Modal */}
+      {activePanel === 'mood' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">How are you feeling today?</h2>
               <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
+                onClick={() => setActivePanel(null)}
+                className="p-2 hover:bg-white/10 rounded-full"
               >
                 ✕
               </button>
-              <iframe
-                src="" // Set this to your Bearapy URL if needed
-                allow="camera; microphone; fullscreen; display-capture"
-                className="w-full h-full rounded-xl border-none"
-                title="Bearapy AI"
-              />
             </div>
+            <MoodTracker onClose={() => setActivePanel(null)} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Wordle Game Modal */}
+      {activePanel === 'wordle' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Wordle Challenge</h2>
+              <button
+                onClick={() => setActivePanel(null)}
+                className="p-2 hover:bg-white/10 rounded-full"
+              >
+                ✕
+              </button>
+            </div>
+            <WordleGame />
+          </div>
+        </div>
+      )}
+
+      {/* Bearapy AI Pop-Up */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
+          <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
+            >
+              ✕
+            </button>
+            <iframe
+              src="" // Optional Bearapy URL
+              allow="camera; microphone; fullscreen; display-capture"
+              className="w-full h-full rounded-xl border-none"
+              title="Bearapy AI"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

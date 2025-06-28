@@ -122,6 +122,8 @@ interface GamificationState {
   claimReward: (rewardId: string) => Promise<void>;
   claimDailyStreak: () => Promise<void>;
   clearNewBadges: () => void;
+ completeWordle: () => Promise<void>;
+
 }
 
 export const useGamificationStore = create<GamificationState>((set, get) => ({
@@ -371,6 +373,35 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
         reward_data: { amount: experienceGained, reason: 'Journal entry' }
       }]);
   },
+
+completeWordle: async () => {
+  const { user } = useAuthStore.getState();
+  if (!user) return;
+
+  const experienceGained = 20; // Adjust as needed
+  const { userProgress } = get();
+  
+
+  if (userProgress) {
+    const newExperience = userProgress.experience_points + experienceGained;
+    const newLevel = Math.floor(newExperience / 100) + 1;
+
+    await get().updateProgress({
+      experience_points: newExperience,
+      level: newLevel,
+      last_activity_date: new Date().toISOString().split('T')[0]
+    });
+  }
+
+  await supabase
+    .from('user_rewards')
+    .insert([{
+      user_id: user.id,
+      reward_type: 'experience',
+      reward_data: { amount: experienceGained, reason: 'Wordle completed' }
+    }]);
+},
+
 
   claimReward: async (rewardId) => {
     try {
