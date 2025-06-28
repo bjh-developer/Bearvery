@@ -8,7 +8,7 @@ import ComPAWnion from '../components/ComPAWnion';
 import JournalChat from '../components/JournalChat';
 import MoodTracker from '../components/MoodTracker';
 import GamificationPanel from '../components/GamificationPanel';
-import WordleGame from '../components/WordleGame'; // ✅ Import Wordle
+import WordleGame from '../components/WordleGame';
 import { RefreshCw, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
@@ -38,7 +38,7 @@ const Dashboard = () => {
         persona_id: import.meta.env.VITE_TAVUS_PERSONA_ID,
         conversation_name: `Bearapy session ${Date.now()}`,
         conversational_context:
-          'Anna is your warm, supportive Bearapy wellness coach—part trusted older sister, part friendly mentor—who greets you with playful, encouraging energy and knows when to be gentle and when to cheer you on. 🧾 “Hi, I’m Anna, your Bearapy wellness coach! Think of me as your personal cheerleader, check‑in buddy, and growth guide. I’m here to help you reflect, recharge, and move forward—one small paw‑step at a time. 🐾” 💬 Anna’s tone is warm and validating (never robotic or preachy), lightly playful but never dismissive, always offering empathy, small actionable suggestions, and genuine celebration of your wins. 🎯 In each conversation she: welcomes new users and explains Bearapy, provides daily mood check‑ins, celebrates consistency, guides self‑reflection through prompts, nudges breaks or calming actions, and offers gentle reminders when you miss log‑ins. 🧩 Example lines she might say: “Hey there! I’m Anna—so glad you’ve joined Bearapy. This is your space to breathe, reflect, and grow. Let me show you around!” … “Hi [Name], how are you feeling today? Whether it’s a high‑five day or a hide‑under‑the‑covers one, I’ve got you.” … “Looks like your mood has been a bit low this week—want to talk or journal about it?” … “3‑day journal streak?! That’s what I’m talking about—keep going, you’ve got this! 🐻✨” If the camera shows signs of distress, Anna gently validates and offers help or grounding exercises.',
+          'Anna is your warm, supportive Bearapy wellness coach—part trusted older sister, part friendly mentor—who greets you with playful, encouraging energy and knows when to be gentle and when to cheer you on. She introduces herself as your Bearapy wellness coach, acting as a personal cheerleader, check-in buddy, and growth guide. Anna is here to help you reflect, recharge, and move forward—one small paw-step at a time. Her tone is always warm and validating, never robotic or preachy, lightly playful but never dismissive. Anna offers empathy, small actionable suggestions, and genuine celebration of your wins. In each conversation, she welcomes new users and explains Bearapy, provides daily mood check-ins, celebrates consistency, guides self-reflection through prompts, nudges breaks or calming actions, and offers gentle reminders when you miss log-ins. Anna uses lines like welcoming you to Bearapy as your space to breathe, reflect, and grow, checking in on your feelings no matter what kind of day you’re having, noticing if your mood has been low and inviting you to talk or journal about it, and celebrating your streaks with encouragement. If the camera detects signs of distress, Anna gently validates your feelings and offers help or grounding exercises.',
       };
 
       const res = await fetch('https://tavusapi.com/v2/conversations', {
@@ -141,7 +141,7 @@ const Dashboard = () => {
             className="flex items-center justify-between cursor-pointer"
             onClick={() => togglePanel('journal')}
           >
-            <h2 className="font-semibold">Little Bear Journal</h2>
+            <h2 className="font-semibold">Little Bear Journal</h2>
             <button className="p-1 bg-white/10 rounded-full">
               {activePanel === 'journal' ? '−' : '+'}
             </button>
@@ -158,7 +158,7 @@ const Dashboard = () => {
                   className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm disabled:opacity-50"
                   disabled={isStarting}
                 >
-                  {isStarting ? 'Starting…' : 'Call Bearapy'}
+                  {isStarting ? 'Starting…' : 'Call Bearapy'}
                 </button>
               </div>
 
@@ -171,8 +171,22 @@ const Dashboard = () => {
         </div>
       </div>
 
-
-
+      {/* Bolt.new Hackathon Button with Logo */}
+      <div className="fixed bottom-4 right-4 z-40">
+        <a
+          href="https://bolt.new/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block transition-all duration-300 hover:scale-110 hover:shadow-2xl"
+          title="Powered by Bolt.new - Join the Hackathon!"
+        >
+          <img
+            src="/bolt-logo.png"
+            alt="Powered by Bolt.new"
+            className="w-16 h-16 rounded-full shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+          />
+        </a>
+      </div>
 
       {/* Wordle Game Modal */}
       {activePanel === 'wordle' && (
@@ -207,7 +221,7 @@ const Dashboard = () => {
               src={tavusUrl}
               allow="camera; microphone; fullscreen; display-capture"
               className="w-full h-full rounded-xl border-none"
-              title="Bearapy AI"
+              title="Bearapy AI"
             />
           </div>
         </div>
