@@ -17,19 +17,23 @@ function App() {
   const { user, setUser } = useAuthStore();
 
   useEffect(() => {
-    // Check active session on load
+    // Check session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser(session.user);
       }
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Subscribe to auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, [setUser]);
 
   return (
@@ -38,13 +42,13 @@ function App() {
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
           <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
       </BackgroundProvider>

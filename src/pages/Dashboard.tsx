@@ -31,21 +31,21 @@ const Dashboard = () => {
     <div className="min-h-screen text-white flex flex-col overflow-hidden">
       {/* Top Bar */}
       <div className="flex justify-between items-center p-4">
-        <button 
+        <button
           onClick={() => togglePanel('mood')}
           className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
         >
           Mood Tracker
         </button>
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={nextBackground}
             className="p-2 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-sm transition"
             aria-label="Change background"
           >
             <RefreshCw size={16} />
           </button>
-          <button 
+          <button
             onClick={() => signOut()}
             className="p-2 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-sm transition"
             aria-label="Sign out"
@@ -67,7 +67,7 @@ const Dashboard = () => {
 
         {/* To-Do List */}
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 min-h-[120px]">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer md:cursor-default"
             onClick={() => togglePanel('todo')}
           >
@@ -83,7 +83,7 @@ const Dashboard = () => {
 
         {/* Journal Chat */}
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 min-h-[120px]">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => togglePanel('journal')}
           >
@@ -108,7 +108,7 @@ const Dashboard = () => {
             <div className="bg-gray-800/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">How are you feeling today?</h2>
-                <button 
+                <button
                   onClick={() => setActivePanel(null)}
                   className="p-2 hover:bg-white/10 rounded-full"
                 >
@@ -124,14 +124,14 @@ const Dashboard = () => {
         {isOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fadeIn">
             <div className="relative bg-white/90 text-black rounded-2xl shadow-2xl p-4 w-[95%] h-[90%] max-w-5xl animate-scaleIn overflow-hidden">
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="absolute top-3 right-4 text-black bg-white/20 hover:bg-white/30 rounded-full px-2 py-1"
               >
                 ✕
               </button>
               <iframe
-                src=""
+                src="" // Set this to your Bearapy URL if needed
                 allow="camera; microphone; fullscreen; display-capture"
                 className="w-full h-full rounded-xl border-none"
                 title="Bearapy AI"
