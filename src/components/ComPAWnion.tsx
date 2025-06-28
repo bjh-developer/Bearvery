@@ -6,11 +6,7 @@ import { useAuthStore } from '../stores/authStore';
 
 // Pet characters
 const pets = [
-  { id: 'cat', name: 'Whiskers', emoji: '🐱' },
-  { id: 'dog', name: 'Buddy', emoji: '🐶' },
-  { id: 'bunny', name: 'Hopper', emoji: '🐰' },
-  { id: 'fox', name: 'Foxy', emoji: '🦊' },
-  { id: 'panda', name: 'Bamboo', emoji: '🐼' },
+  { id: 'bear', name: 'Teddy', image: 'public/bear.png' },
 ];
 
 // Wellness tips
@@ -45,20 +41,15 @@ const ComPAWnion = () => {
   const petRef = useRef<HTMLDivElement>(null);
   const tipInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Load user's pet and custom tips
   useEffect(() => {
     if (user) {
       fetchUserPet();
     }
   }, [user]);
 
-  // Display tips periodically
   useEffect(() => {
-    // Start the interval when component mounts
     startTipInterval();
-
     return () => {
-      // Clear interval when component unmounts
       if (tipInterval.current) {
         clearInterval(tipInterval.current);
       }
@@ -72,11 +63,9 @@ const ComPAWnion = () => {
         .select('*')
         .eq('user_id', user?.id)
         .single();
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "row not found" error
-        throw error;
-      }
-      
+
+      if (error && error.code !== 'PGRST116') throw error;
+
       if (data) {
         const pet = pets.find(p => p.id === data.pet_id) || pets[0];
         setSelectedPet(pet);
@@ -90,7 +79,7 @@ const ComPAWnion = () => {
 
   const saveUserPet = async () => {
     if (!user) return;
-    
+
     try {
       const { error } = await supabase
         .from('user_pets')
@@ -100,24 +89,18 @@ const ComPAWnion = () => {
           custom_tips: customTips,
           happiness: happiness,
         });
-      
+
       if (error) throw error;
-      
     } catch (error) {
       console.error('Error saving user pet:', error);
     }
   };
 
   const startTipInterval = () => {
-    // Clear any existing interval
     if (tipInterval.current) {
       clearInterval(tipInterval.current);
     }
-    
-    // Show first tip after a short delay
     setTimeout(showRandomTip, 5000);
-    
-    // Set interval for subsequent tips (every 30 minutes)
     tipInterval.current = setInterval(showRandomTip, 30 * 60 * 1000);
   };
 
@@ -126,37 +109,18 @@ const ComPAWnion = () => {
     const randomTip = allTips[Math.floor(Math.random() * allTips.length)];
     setCurrentTip(randomTip);
     setIsShowingTip(true);
-    
-    // Hide tip after 10 seconds
-    setTimeout(() => {
-      setIsShowingTip(false);
-    }, 10000);
+    setTimeout(() => setIsShowingTip(false), 10000);
   };
 
   const handlePetClick = () => {
-    // Pet animation
     if (petRef.current) {
       petRef.current.classList.add('scale-110');
-      setTimeout(() => {
-        if (petRef.current) {
-          petRef.current.classList.remove('scale-110');
-        }
-      }, 200);
+      setTimeout(() => petRef.current?.classList.remove('scale-110'), 200);
     }
-    
-    // Increase happiness
     setHappiness(prev => Math.min(prev + 5, 100));
-    
-    // Show reaction
     setCurrentTip("Aww, thanks for the pets! I feel loved!");
     setIsShowingTip(true);
-    
-    // Hide tip after 3 seconds
-    setTimeout(() => {
-      setIsShowingTip(false);
-    }, 3000);
-    
-    // Save updated happiness
+    setTimeout(() => setIsShowingTip(false), 3000);
     saveUserPet();
   };
 
@@ -166,23 +130,18 @@ const ComPAWnion = () => {
       setCustomTips(updatedTips);
       setNewTip('');
       setIsAddingTip(false);
-      
-      // Save to database
       saveUserPet();
     }
   };
 
   const changePet = (pet: typeof pets[0]) => {
     setSelectedPet(pet);
-    // Save to database
     saveUserPet();
   };
 
   const deleteTip = (index: number) => {
     const updatedTips = customTips.filter((_, i) => i !== index);
     setCustomTips(updatedTips);
-    
-    // Save to database
     saveUserPet();
   };
 
@@ -190,14 +149,11 @@ const ComPAWnion = () => {
     <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 relative">
       <div className="flex justify-between items-start">
         <h2 className="font-semibold">Your ComPAWnion</h2>
-        <button 
-          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-          className="p-1 bg-white/10 hover:bg-white/20 rounded-full text-xs"
-        >
+        <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-1 bg-white/10 hover:bg-white/20 rounded-full text-xs">
           {isSettingsOpen ? 'Close' : 'Settings'}
         </button>
       </div>
-      
+
       {isSettingsOpen ? (
         <div className="mt-4">
           <h3 className="text-sm font-medium mb-2">Choose your pet:</h3>
@@ -206,17 +162,15 @@ const ComPAWnion = () => {
               <button
                 key={pet.id}
                 onClick={() => changePet(pet)}
-                className={`p-2 rounded-lg text-2xl ${
-                  selectedPet.id === pet.id
-                    ? 'bg-white/30 ring-2 ring-white'
-                    : 'bg-white/10 hover:bg-white/20'
+                className={`p-2 rounded-lg ${
+                  selectedPet.id === pet.id ? 'bg-white/30 ring-2 ring-white' : 'bg-white/10 hover:bg-white/20'
                 }`}
               >
-                {pet.emoji}
+                <img src={pet.image} alt={pet.name} className="w-10 h-10 object-cover rounded-full" />
               </button>
             ))}
           </div>
-          
+
           <h3 className="text-sm font-medium mb-2">Your custom tips ({customTips.length}/20):</h3>
           {customTips.length === 0 ? (
             <p className="text-sm text-white/70 mb-2">No custom tips added yet.</p>
@@ -225,17 +179,12 @@ const ComPAWnion = () => {
               {customTips.map((tip, index) => (
                 <li key={index} className="flex justify-between items-center text-sm mb-1 p-1 hover:bg-white/10 rounded">
                   <span className="mr-2">{tip}</span>
-                  <button 
-                    onClick={() => deleteTip(index)}
-                    className="text-xs bg-white/10 hover:bg-white/20 p-1 rounded"
-                  >
-                    ✕
-                  </button>
+                  <button onClick={() => deleteTip(index)} className="text-xs bg-white/10 hover:bg-white/20 p-1 rounded">✕</button>
                 </li>
               ))}
             </ul>
           )}
-          
+
           {isAddingTip ? (
             <div className="mt-2">
               <input
@@ -277,41 +226,31 @@ const ComPAWnion = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center mt-4">
-          <div 
-            ref={petRef}
-            className="text-6xl mb-2 cursor-pointer transition-transform duration-200"
-            onClick={handlePetClick}
-          >
-            {selectedPet.emoji}
+          <div ref={petRef} className="mb-2 cursor-pointer transition-transform duration-200" onClick={handlePetClick}>
+            <img src={selectedPet.image} alt={selectedPet.name} className="w-24 h-24 object-cover rounded-full" />
           </div>
-          
+
           <div className="text-center mb-2">
             <div className="font-medium">{selectedPet.name}</div>
             <div className="text-xs text-white/70">Click to pet</div>
           </div>
-          
+
           <div className="w-full bg-white/10 rounded-full h-2 mb-2">
-            <div 
+            <div
               className="bg-pink-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${happiness}%` }}
             ></div>
           </div>
-          
+
           <div className="flex gap-2 mt-2">
-            <button
-              onClick={handlePetClick}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full"
-            >
+            <button onClick={handlePetClick} className="p-2 bg-white/10 hover:bg-white/20 rounded-full">
               <Heart size={16} className="text-pink-400" />
             </button>
-            <button
-              onClick={showRandomTip}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full"
-            >
+            <button onClick={showRandomTip} className="p-2 bg-white/10 hover:bg-white/20 rounded-full">
               <MessageCircle size={16} />
             </button>
           </div>
-          
+
           <AnimatePresence>
             {isShowingTip && (
               <motion.div
