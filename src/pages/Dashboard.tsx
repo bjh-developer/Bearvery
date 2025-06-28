@@ -8,7 +8,7 @@ import ComPAWnion from '../components/ComPAWnion';
 import JournalChat from '../components/JournalChat';
 import MoodTracker from '../components/MoodTracker';
 import GamificationPanel from '../components/GamificationPanel';
-import WordleGame from '../components/WordleGame'; // ✅ Import Wordle
+import WordleGame from '../components/WordleGame'; //  Import Wordle
 import { RefreshCw, LogOut } from 'lucide-react';
 
 const Dashboard = () => {
@@ -45,11 +45,12 @@ const Dashboard = () => {
             Mood Tracker
           </button>
           <button
-            onClick={() => togglePanel('wordle')}
-            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
-          >
-            Wordle Game
-          </button>
+  onClick={() => togglePanel('wordle')}
+  className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg animate-bounce hover:animate-none transition"
+>
+  🎯 Play Wordle Challenge
+</button>
+
         </div>
         <div className="flex items-center gap-2">
           <button
