@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from './authStore';
+import { differenceInCalendarDays, isToday } from 'date-fns';
 
 export interface Badge {
   id: string;
@@ -39,7 +40,6 @@ export interface Reward {
   earned_at: string;
 }
 
-// Available badges
 export const BADGES: Badge[] = [
   {
     id: 'first_task',
@@ -113,15 +113,17 @@ interface GamificationState {
   unclaimedRewards: Reward[];
   newBadges: Badge[];
   loading: boolean;
-  
-  // Actions
+
   fetchUserProgress: () => Promise<void>;
   updateProgress: (updates: Partial<UserProgress>) => Promise<void>;
   completeTask: () => Promise<void>;
   trackMood: () => Promise<void>;
   writeJournal: () => Promise<void>;
   claimReward: (rewardId: string) => Promise<void>;
+  claimDailyStreak: () => Promise<void>;
   clearNewBadges: () => void;
+ completeWordle: () => Promise<void>;
+
 }
 
 export const useGamificationStore = create<GamificationState>((set, get) => ({
@@ -136,20 +138,16 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
     if (!user) return;
 
     set({ loading: true });
-    
+
     try {
-      // Fetch user progress
       const { data: progressData, error: progressError } = await supabase
         .from('user_progress')
         .select('*')
         .eq('user_id', user.id)
         .single();
 
-      if (progressError && progressError.code !== 'PGRST116') {
-        throw progressError;
-      }
+      if (progressError && progressError.code !== 'PGRST116') throw progressError;
 
-      // Create initial progress if doesn't exist
       if (!progressData) {
         const initialProgress = {
           user_id: user.id,
@@ -172,7 +170,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
         set({ userProgress: progressData });
       }
 
-      // Fetch user badges
       const { data: badgesData, error: badgesError } = await supabase
         .from('user_badges')
         .select('*')
@@ -181,7 +178,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
       if (badgesError) throw badgesError;
       set({ userBadges: badgesData || [] });
 
-      // Fetch unclaimed rewards
       const { data: rewardsData, error: rewardsError } = await supabase
         .from('user_rewards')
         .select('*')
@@ -227,7 +223,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
     const newExperience = userProgress.experience_points + experienceGained;
     const newLevel = Math.floor(newExperience / 100) + 1;
 
-    // Update progress
     await get().updateProgress({
       total_tasks_completed: newTasksCompleted,
       experience_points: newExperience,
@@ -235,7 +230,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
       last_activity_date: new Date().toISOString().split('T')[0]
     });
 
-    // Check for new badges
     const earnedBadgeIds = userBadges.map(b => b.badge_id);
     const newBadges: Badge[] = [];
 
@@ -250,16 +244,15 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
         case 'level':
           shouldEarn = newLevel >= badge.requirement.value;
           break;
+        case 'streak':
+          shouldEarn = userProgress.streak_days >= badge.requirement.value;
+          break;
       }
 
       if (shouldEarn) {
-        // Award badge
         const { error } = await supabase
           .from('user_badges')
-          .insert([{
-            user_id: user.id,
-            badge_id: badge.id
-          }]);
+          .insert([{ user_id: user.id, badge_id: badge.id }]);
 
         if (!error) {
           newBadges.push(badge);
@@ -269,11 +262,9 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
 
     if (newBadges.length > 0) {
       set({ newBadges: [...get().newBadges, ...newBadges] });
-      // Refresh badges
       await get().fetchUserProgress();
     }
 
-    // Create reward for task completion
     await supabase
       .from('user_rewards')
       .insert([{
@@ -283,11 +274,58 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
       }]);
   },
 
+  claimDailyStreak: async () => {
+    const { user } = useAuthStore.getState();
+    const { userProgress, userBadges } = get();
+    if (!user || !userProgress) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = userProgress.last_activity_date;
+    const streakDelta = lastDate ? differenceInCalendarDays(new Date(), new Date(lastDate)) : Infinity;
+
+    let updatedStreak = streakDelta === 1 ? userProgress.streak_days + 1 : 1;
+
+    await get().updateProgress({
+      streak_days: updatedStreak,
+      last_activity_date: today
+    });
+
+    const earnedBadgeIds = userBadges.map(b => b.badge_id);
+    const newBadges: Badge[] = [];
+
+    for (const badge of BADGES) {
+      if (badge.requirement.type !== 'streak') continue;
+      if (earnedBadgeIds.includes(badge.id)) continue;
+
+      if (updatedStreak >= badge.requirement.value) {
+        const { error } = await supabase
+          .from('user_badges')
+          .insert([{ user_id: user.id, badge_id: badge.id }]);
+
+        if (!error) {
+          newBadges.push(badge);
+        }
+      }
+    }
+
+    if (newBadges.length > 0) {
+      set({ newBadges: [...get().newBadges, ...newBadges] });
+      await get().fetchUserProgress();
+    }
+
+    await supabase
+      .from('user_rewards')
+      .insert([{
+        user_id: user.id,
+        reward_type: 'experience',
+        reward_data: { amount: 20, reason: 'Daily streak claimed' }
+      }]);
+  },
+
   trackMood: async () => {
     const { user } = useAuthStore.getState();
     if (!user) return;
 
-    // Award experience for mood tracking
     const experienceGained = 5;
     const { userProgress } = get();
     if (userProgress) {
@@ -301,7 +339,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
       });
     }
 
-    // Create reward
     await supabase
       .from('user_rewards')
       .insert([{
@@ -315,7 +352,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
     const { user } = useAuthStore.getState();
     if (!user) return;
 
-    // Award experience for journaling
     const experienceGained = 15;
     const { userProgress } = get();
     if (userProgress) {
@@ -329,7 +365,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
       });
     }
 
-    // Create reward
     await supabase
       .from('user_rewards')
       .insert([{
@@ -338,6 +373,35 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
         reward_data: { amount: experienceGained, reason: 'Journal entry' }
       }]);
   },
+
+completeWordle: async () => {
+  const { user } = useAuthStore.getState();
+  if (!user) return;
+
+  const experienceGained = 20; // Adjust as needed
+  const { userProgress } = get();
+  
+
+  if (userProgress) {
+    const newExperience = userProgress.experience_points + experienceGained;
+    const newLevel = Math.floor(newExperience / 100) + 1;
+
+    await get().updateProgress({
+      experience_points: newExperience,
+      level: newLevel,
+      last_activity_date: new Date().toISOString().split('T')[0]
+    });
+  }
+
+  await supabase
+    .from('user_rewards')
+    .insert([{
+      user_id: user.id,
+      reward_type: 'experience',
+      reward_data: { amount: experienceGained, reason: 'Wordle completed' }
+    }]);
+},
+
 
   claimReward: async (rewardId) => {
     try {
@@ -348,7 +412,6 @@ export const useGamificationStore = create<GamificationState>((set, get) => ({
 
       if (error) throw error;
 
-      // Remove from unclaimed rewards
       set({
         unclaimedRewards: get().unclaimedRewards.filter(r => r.id !== rewardId)
       });

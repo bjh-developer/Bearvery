@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGamificationStore, BADGES } from '../stores/gamificationStore';
-import { Trophy, Star, Award, Gift, X, Zap } from 'lucide-react';
+import { Trophy, Award, Gift, X, Zap, Flame } from 'lucide-react';
+import { isToday, parseISO, differenceInHours } from 'date-fns';
 
 const GamificationPanel = () => {
   const {
@@ -12,6 +13,7 @@ const GamificationPanel = () => {
     loading,
     fetchUserProgress,
     claimReward,
+    claimDailyStreak,
     clearNewBadges
   } = useGamificationStore();
 
@@ -22,7 +24,6 @@ const GamificationPanel = () => {
     fetchUserProgress();
   }, [fetchUserProgress]);
 
-  // Show new badge notification
   useEffect(() => {
     if (newBadges.length > 0) {
       setShowBadgeModal(true);
@@ -45,7 +46,13 @@ const GamificationPanel = () => {
 
   const earnedBadgeIds = userBadges.map(b => b.badge_id);
   const earnedBadges = BADGES.filter(badge => earnedBadgeIds.includes(badge.id));
-  const availableBadges = BADGES.filter(badge => !earnedBadgeIds.includes(badge.id));
+
+  // 🟢 Daily Streak Logic
+  const lastDate = userProgress.last_activity_date;
+  const lastClaimDate = lastDate ? parseISO(lastDate) : null;
+  const now = new Date();
+  const hasClaimedToday = lastClaimDate ? isToday(lastClaimDate) : false;
+  const hoursSinceLastClaim = lastClaimDate ? differenceInHours(now, lastClaimDate) : 999;
 
   return (
     <>
@@ -107,6 +114,30 @@ const GamificationPanel = () => {
           </div>
         </div>
 
+        {/* 🔥 Daily Streak */}
+        <div className="bg-white/5 rounded-lg p-4 text-center mb-4">
+          <div className="flex items-center justify-center gap-2 text-orange-400 font-bold text-lg">
+            <Flame size={20} />
+            {userProgress.streak_days} Day Streak
+          </div>
+          <button
+            disabled={hasClaimedToday}
+            onClick={async () => {
+              await claimDailyStreak();
+              fetchUserProgress();
+            }}
+            className={`mt-2 w-full px-4 py-2 text-sm rounded-lg font-medium transition ${
+              hasClaimedToday
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-orange-500 hover:bg-orange-600'
+            }`}
+          >
+            {hasClaimedToday
+              ? `Come back in ${24 - hoursSinceLastClaim}h`
+              : 'Claim Daily Streak'}
+          </button>
+        </div>
+
         {/* Recent Badges */}
         {earnedBadges.length > 0 && (
           <div>
@@ -126,6 +157,7 @@ const GamificationPanel = () => {
         )}
       </div>
 
+      {/* Modals (unchanged) */}
       {/* New Badge Modal */}
       <AnimatePresence>
         {showBadgeModal && newBadges.length > 0 && (
@@ -144,7 +176,6 @@ const GamificationPanel = () => {
               <div className="text-center">
                 <div className="text-4xl mb-4">🎉</div>
                 <h3 className="text-xl font-bold mb-2">New Badge Earned!</h3>
-                
                 {newBadges.map((badge) => (
                   <div key={badge.id} className="mb-4">
                     <div className={`${badge.color} rounded-lg p-4 mb-2`}>
@@ -154,7 +185,6 @@ const GamificationPanel = () => {
                     </div>
                   </div>
                 ))}
-                
                 <button
                   onClick={() => {
                     setShowBadgeModal(false);
