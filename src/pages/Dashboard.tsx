@@ -46,7 +46,8 @@ const Dashboard = () => {
           </button>
           <button
   onClick={() => togglePanel('wordle')}
-  className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg animate-bounce hover:animate-none transition"
+  className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg transition"
+
 >
   🎯 Play Wordle Challenge
 </button>
