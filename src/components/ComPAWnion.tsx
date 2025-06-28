@@ -6,7 +6,7 @@ import { useAuthStore } from '../stores/authStore';
 
 // Pet characters
 const pets = [
-  { id: 'bear', name: 'Teddy', image: '/dist/bear.png' },
+  { id: 'bear', name: 'Teddy', image: '/dist/icons/bear.png' },
 ];
 
 // Wellness tips
