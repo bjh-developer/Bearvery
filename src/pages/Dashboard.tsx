@@ -7,7 +7,6 @@ import TodoList from '../components/TodoList';
 import ComPAWnion from '../components/ComPAWnion';
 import JournalChat from '../components/JournalChat';
 import MoodTracker from '../components/MoodTracker';
-import BreakTimer from '../components/BreakTimer';
 import GamificationPanel from '../components/GamificationPanel';
 import { RefreshCw, LogOut } from 'lucide-react';
 
