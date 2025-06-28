@@ -98,36 +98,47 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Journal Chat panel */}
-        <div className={`
-          bg-white/10 backdrop-blur-md rounded-xl p-4 overflow-hidden transition-all duration-300 ease-in-out
-          ${activePanel === 'journal' ? 'h-96' : 'h-12'}
-        `}>
-          <div 
+        {/* Little Bear Journal panel */}
+        <div
+          className={`
+            bg-white/10 backdrop-blur-md rounded-xl p-4 transition-all duration-300 ease-in-out
+            ${activePanel === 'journal' ? 'h-96' : 'h-12'}
+            flex flex-col min-h-0          /* let center area scroll */
+          `}
+        >
+          {/* Header bar (click to expand/collapse) */}
+          <div
             className="flex items-center justify-between cursor-pointer"
             onClick={() => togglePanel('journal')}
           >
-            <h2 className="font-semibold">Little Bear Journal</h2>
+            <h2 className="font-semibold">Little Bear Journal</h2>
             <button className="p-1 bg-white/10 rounded-full">
               {activePanel === 'journal' ? '−' : '+'}
             </button>
           </div>
 
-          <div>
-            <div 
-              className="flex items-center justify-between cursor-pointer"
-              onClick={handleCallBearapy}
-            >
-              <button className="p-1 bg-white/10 rounded-full">
-                Call Bearapy
-              </button>
-            </div>
-          </div>
-          
-          <div className={`mt-2 ${activePanel === 'journal' ? 'block' : 'hidden'}`}>
-            <JournalChat />
-          </div>
+          {/* Show this area only when expanded */}
+          {activePanel === 'journal' && (
+            <>
+              {/* Call Bearapy button — inside the panel */}
+              <div className="mt-2">
+                <button
+                  onClick={handleCallBearapy}
+                  className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm"
+                >
+                  Call Bearapy
+                </button>
+              </div>
+
+              {/* Scrollable chat viewport */}
+              <div className="mt-2 flex-1 overflow-y-auto">
+                <JournalChat />
+              </div>
+            </>
+          )}
         </div>
+
+
 
         {/* Bearapy AI Pop-Up - moved outside journal panel */}
         {isOpen && (
@@ -154,26 +165,6 @@ const Dashboard = () => {
           </div>
         )}
 
-        
-        {/* Break Timer */}
-        <div className={`
-          bg-white/10 backdrop-blur-md rounded-xl p-4 overflow-hidden transition-all duration-300 ease-in-out
-          ${activePanel === 'break' ? 'h-64' : 'h-12'}
-        `}>
-          <div 
-            className="flex items-center justify-between cursor-pointer"
-            onClick={() => togglePanel('break')}
-          >
-            <h2 className="font-semibold">Break Timer</h2>
-            <button className="p-1 bg-white/10 rounded-full">
-              {activePanel === 'break' ? '−' : '+'}
-            </button>
-          </div>
-          
-          <div className={`mt-2 ${activePanel === 'break' ? 'block' : 'hidden'}`}>
-            <BreakTimer />
-          </div>
-        </div>
         
         {/* Mood Tracker Panel (conditionally rendered) */}
         {activePanel === 'mood' && (
