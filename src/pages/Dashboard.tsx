@@ -33,6 +33,8 @@ const Dashboard = () => {
     setActivePanel(activePanel === panel ? null : panel);
   };
 
+  const tavusURL = import.meta.env.VITE_TAVUS_URL;
+
   return (
     <div className="min-h-screen text-white flex flex-col overflow-hidden">
       {/* Top Bar */}
@@ -143,7 +145,7 @@ const Dashboard = () => {
 
               {/* Tavus iframe */}
               <iframe
-                src=""  // Replace with your real conversation URL
+                src={tavusURL}
                 allow="camera; microphone; fullscreen; display-capture"
                 className="w-full h-full rounded-xl border-none"
                 title="Bearapy AI"
