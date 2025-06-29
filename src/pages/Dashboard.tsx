@@ -77,9 +77,9 @@ const Dashboard = () => {
           </button>
           <button
             onClick={() => togglePanel('wordle')}
-            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm backdrop-blur-sm transition"
+            className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg transition"
           >
-            Wordle Game
+            🎯 Play Wordle Challenge
           </button>
         </div>
         <div className="flex items-center gap-2">
