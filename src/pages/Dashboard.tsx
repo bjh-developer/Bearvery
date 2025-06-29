@@ -65,7 +65,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen text-white flex flex-col overflow-hidden">
+    <div className="h-screen text-white flex flex-col overflow-hidden">
       {/* Top Bar */}
       <div className="flex justify-between items-center p-4">
         <div className="flex gap-2">
