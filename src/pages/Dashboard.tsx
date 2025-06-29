@@ -38,7 +38,7 @@ const Dashboard = () => {
         persona_id: import.meta.env.VITE_TAVUS_PERSONA_ID,
         conversation_name: `Bearapy session ${Date.now()}`,
         conversational_context:
-          'Anna is your warm, supportive Bearapy wellness coach—part trusted older sister, part friendly mentor—who greets you with playful, encouraging energy and knows when to be gentle and when to cheer you on. She introduces herself as your Bearapy wellness coach, acting as a personal cheerleader, check-in buddy, and growth guide. Anna is here to help you reflect, recharge, and move forward—one small paw-step at a time. Her tone is always warm and validating, never robotic or preachy, lightly playful but never dismissive. Anna offers empathy, small actionable suggestions, and genuine celebration of your wins. In each conversation, she welcomes new users and explains Bearapy, provides daily mood check-ins, celebrates consistency, guides self-reflection through prompts, nudges breaks or calming actions, and offers gentle reminders when you miss log-ins. Anna uses lines like welcoming you to Bearapy as your space to breathe, reflect, and grow, checking in on your feelings no matter what kind of day you’re having, noticing if your mood has been low and inviting you to talk or journal about it, and celebrating your streaks with encouragement. If the camera detects signs of distress, Anna gently validates your feelings and offers help or grounding exercises.',
+          'Anna is your warm, supportive Bearapy wellness coach—part trusted older sister, part friendly mentor—who greets you with playful, encouraging energy and knows when to be gentle and when to cheer you on. She introduces herself as your Bearapy wellness coach, acting as a personal cheerleader, check-in buddy, and growth guide. Anna is here to help you reflect, recharge, and move forward—one small paw-step at a time. Her tone is always warm and validating, never robotic or preachy, lightly playful but never dismissive. Anna offers empathy, small actionable suggestions, and genuine celebration of your wins. In each conversation, she welcomes new users and explains Bearapy, provides daily mood check-ins, celebrates consistency, guides self-reflection through prompts, nudges breaks or calming actions, and offers gentle reminders when you miss log-ins. Anna uses lines like welcoming you to Bearapy as your space to breathe, reflect, and grow, checking in on your feelings no matter what kind of day you're having, noticing if your mood has been low and inviting you to talk or journal about it, and celebrating your streaks with encouragement. If the camera detects signs of distress, Anna gently validates your feelings and offers help or grounding exercises.',
       };
 
       const res = await fetch('https://tavusapi.com/v2/conversations', {
@@ -65,9 +65,9 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen text-white flex flex-col overflow-hidden">
+    <div className="h-screen text-white flex flex-col overflow-hidden">
       {/* Top Bar */}
-      <div className="flex justify-between items-center p-4">
+      <div className="flex-shrink-0 flex justify-between items-center p-4">
         <div className="flex gap-2">
           <button
             onClick={() => togglePanel('mood')}
@@ -76,13 +76,11 @@ const Dashboard = () => {
             Mood Tracker
           </button>
           <button
-  onClick={() => togglePanel('wordle')}
-  className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg transition"
-
->
-  🎯 Play Wordle Challenge
-</button>
-
+            onClick={() => togglePanel('wordle')}
+            className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-300 hover:to-pink-400 rounded-full text-sm font-bold text-black shadow-lg transition"
+          >
+            🎯 Play Wordle Challenge
+          </button>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -102,74 +100,80 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Clock */}
-      <div className="flex-shrink-0 flex flex-col items-center justify-center px-4 mt-4 mb-6">
+      {/* Clock Section */}
+      <div className="flex-shrink-0 flex flex-col items-center justify-center px-4 py-4">
         <Clock />
       </div>
 
-      {/* Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 pb-16">
-        <GamificationPanel />
-        <ComPAWnion />
+      {/* Main Content Grid - Takes remaining space */}
+      <div className="flex-1 overflow-hidden p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+          {/* Gamification Panel */}
+          <div className="min-h-0">
+            <GamificationPanel />
+          </div>
 
-        {/* To-Do List */}
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 min-h-[120px]">
+          {/* ComPAWnion */}
+          <div className="min-h-0">
+            <ComPAWnion />
+          </div>
+
+          {/* To-Do List */}
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 flex flex-col min-h-0">
+            <div
+              className="flex items-center justify-between cursor-pointer md:cursor-default flex-shrink-0"
+              onClick={() => togglePanel('todo')}
+            >
+              <h2 className="font-semibold">To-Do List</h2>
+              <button className="md:hidden p-1 bg-white/10 rounded-full">
+                {activePanel === 'todo' ? '−' : '+'}
+              </button>
+            </div>
+            <div className={`flex-1 min-h-0 ${activePanel === 'todo' ? 'block' : 'hidden md:block'}`}>
+              <TodoList />
+            </div>
+          </div>
+
+          {/* Little Bear Journal panel */}
           <div
-            className="flex items-center justify-between cursor-pointer md:cursor-default"
-            onClick={() => togglePanel('todo')}
+            className={`
+              bg-white/10 backdrop-blur-md rounded-xl p-4 transition-all duration-300 ease-in-out
+              ${activePanel === 'journal' ? 'row-span-2' : ''}
+              flex flex-col min-h-0
+            `}
           >
-            <h2 className="font-semibold">To-Do List</h2>
-            <button className="md:hidden p-1 bg-white/10 rounded-full">
-              {activePanel === 'todo' ? '−' : '+'}
-            </button>
+            {/* Header bar (click to expand/collapse) */}
+            <div
+              className="flex items-center justify-between cursor-pointer flex-shrink-0"
+              onClick={() => togglePanel('journal')}
+            >
+              <h2 className="font-semibold">Little Bear Journal</h2>
+              <button className="p-1 bg-white/10 rounded-full">
+                {activePanel === 'journal' ? '−' : '+'}
+              </button>
+            </div>
+
+            {/* Show this area only when expanded */}
+            {activePanel === 'journal' && (
+              <>
+                {/* Call Bearapy button — inside the panel */}
+                <div className="mt-2 flex-shrink-0">
+                  <button
+                    onClick={handleCallBearapy}
+                    className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm disabled:opacity-50"
+                    disabled={isStarting}
+                  >
+                    {isStarting ? 'Starting…' : 'Call Bearapy'}
+                  </button>
+                </div>
+
+                {/* Scrollable chat viewport */}
+                <div className="mt-2 flex-1 min-h-0 overflow-hidden">
+                  <JournalChat />
+                </div>
+              </>
+            )}
           </div>
-          <div className={`mt-2 ${activePanel === 'todo' ? 'block' : 'hidden md:block'}`}>
-            <TodoList />
-          </div>
-        </div>
-
-        
-        {/* Little Bear Journal panel */}
-        <div
-          className={`
-            bg-white/10 backdrop-blur-md rounded-xl p-4 transition-all duration-300 ease-in-out
-            ${activePanel === 'journal' ? 'h-96' : 'h-12'}
-            flex flex-col min-h-0          /* let center area scroll */
-          `}
-        >
-          {/* Header bar (click to expand/collapse) */}
-
-          <div
-            className="flex items-center justify-between cursor-pointer"
-            onClick={() => togglePanel('journal')}
-          >
-            <h2 className="font-semibold">Little Bear Journal</h2>
-            <button className="p-1 bg-white/10 rounded-full">
-              {activePanel === 'journal' ? '−' : '+'}
-            </button>
-          </div>
-
-
-          {/* Show this area only when expanded */}
-          {activePanel === 'journal' && (
-            <>
-              {/* Call Bearapy button — inside the panel */}
-              <div className="mt-2">
-                <button
-                  onClick={handleCallBearapy}
-                  className="px-3 py-1 bg-white/15 hover:bg-white/25 rounded-md text-sm disabled:opacity-50"
-                  disabled={isStarting}
-                >
-                  {isStarting ? 'Starting…' : 'Call Bearapy'}
-                </button>
-              </div>
-
-              {/* Scrollable chat viewport */}
-              <div className="mt-2 flex-1 overflow-y-auto">
-                <JournalChat />
-              </div>
-            </>
-          )}
         </div>
       </div>
 
@@ -202,10 +206,10 @@ const Dashboard = () => {
               >
                 ✕
               </button>
+            </div>
+            <WordleGame />
           </div>
-          <WordleGame />
         </div>
-      </div>
       )}
 
       {/* Bearapy AI Pop-Up - moved outside journal panel */}
